@@ -1,0 +1,330 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ─── Auth Models (NextAuth) ───────────────────────────────────────────────────
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+// ─── Domain Models ────────────────────────────────────────────────────────────
+
+model User {
+  id            String    @id @default(cuid())
+  name          String?
+  email         String?   @unique
+  emailVerified DateTime?
+  image         String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  accounts           Account[]
+  sessions           Session[]
+  financialProfiles  FinancialProfile[]
+  contextNotes       UserContextNote[]
+  propertyAnalyses   PropertyAnalysis[]
+  chatMessages       ChatMessage[]
+  scenarioComparisons ScenarioComparison[]
+}
+
+enum EmploymentType {
+  SALARIED
+  SELF_EMPLOYED
+  MIXED
+}
+
+enum IncomeStability {
+  HIGH
+  MEDIUM
+  LOW
+}
+
+enum IncomeChangeExpectation {
+  INCREASE
+  STABLE
+  DECREASE
+}
+
+enum Goal {
+  RESIDENCE
+  INVESTMENT
+  MIXED
+  UNSURE
+}
+
+enum Timeline {
+  SHORT
+  MEDIUM
+  LONG
+}
+
+enum RiskAppetite {
+  LOW
+  MEDIUM
+  HIGH
+}
+
+enum Priority {
+  STABILITY
+  FLEXIBILITY
+  UPSIDE
+  MONTHLY_CASH_FLOW
+}
+
+enum PropertyPreference {
+  NEW_PROJECT
+  SECOND_HAND
+  NO_PREFERENCE
+}
+
+model FinancialProfile {
+  id        String   @id @default(cuid())
+  userId    String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Step 1: Household Income
+  primaryIncomeNet      Float?
+  partnerIncomeNet      Float?
+  variableIncome        Float?
+  employmentType        EmploymentType?
+  incomeStability       IncomeStability?
+  expectedIncomeChange  IncomeChangeExpectation?
+
+  // Step 2: Monthly Outflows
+  monthlyObligations    Float?
+  currentRent           Float?
+  fixedHouseholdExpenses Float?
+  comfortablePayment    Float?
+  paymentCeiling        Float?
+
+  // Step 4: Goal, Timeline, Risk
+  goal                  Goal?
+  timeline              Timeline?
+  riskAppetite          RiskAppetite?
+  priority              Priority?
+
+  // Step 5: Preferences
+  preferredAreas        Json?
+  propertyPreference    PropertyPreference?
+  budgetRangeMin        Float?
+  budgetRangeMax        Float?
+
+  // Onboarding completion
+  onboardingCompleted   Boolean @default(false)
+  currentStep           Int     @default(1)
+
+  user            User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  capitalSources  CapitalSources?
+  analyses        PropertyAnalysis[]
+
+  @@index([userId])
+}
+
+model CapitalSources {
+  id        String @id @default(cuid())
+  profileId String @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Immediate liquid
+  cashAmount          Float @default(0)
+  liquidSavings       Float @default(0)
+
+  // Semi-liquid
+  studyFunds          Float @default(0)
+  providentFunds      Float @default(0)
+  investmentPortfolio Float @default(0)
+  deposits            Float @default(0)
+
+  // Property-backed
+  ownsProperty              Boolean @default(false)
+  currentPropertyValue      Float   @default(0)
+  currentPropertyMortgage   Float   @default(0)
+  expectedPropertySale      Boolean @default(false)
+
+  // Potential
+  familySupport       Float @default(0)
+  expectedBonus       Float @default(0)
+  futureAssetSale     Float @default(0)
+  futureFundRelease   Float @default(0)
+
+  profile FinancialProfile @relation(fields: [profileId], references: [id], onDelete: Cascade)
+}
+
+enum ContextSourceType {
+  ONBOARDING
+  CHAT
+  ANALYSIS
+}
+
+model UserContextNote {
+  id        String   @id @default(cuid())
+  userId    String
+  profileId String?
+  createdAt DateTime @default(now())
+
+  sourceType ContextSourceType
+  rawText    String  @db.Text
+  parsedTags Json?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+enum PropertyType {
+  NEW_PROJECT
+  SECOND_HAND
+}
+
+enum IntendedUse {
+  RESIDENCE
+  INVESTMENT
+}
+
+model PropertyAnalysis {
+  id        String   @id @default(cuid())
+  userId    String
+  profileId String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  nickname          String?
+  city              String
+  neighborhood      String?
+  propertyPrice     Float
+  propertyType      PropertyType
+  intendedUse       IntendedUse
+  estimatedRent     Float?
+  closingCosts      Float?
+  renovationCosts   Float?
+  furnitureCosts    Float?
+  purchaseTaxEstimate Float?
+  ltvPercent        Float   @default(70)
+  interestRate      Float   @default(4.5)
+  mortgageYears     Int     @default(30)
+  maintenanceMonthly Float  @default(500)
+  vacancyPercent    Float   @default(5)
+
+  user    User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  profile FinancialProfile @relation(fields: [profileId], references: [id])
+  result  AnalysisResult?
+
+  scenarioA ScenarioComparison[] @relation("ScenarioA")
+  scenarioB ScenarioComparison[] @relation("ScenarioB")
+
+  @@index([userId])
+}
+
+enum ViabilityStatus {
+  VIABLE
+  VIABLE_BUT_TIGHT
+  HIGH_RISK
+  NOT_AFFORDABLE
+}
+
+model AnalysisResult {
+  id         String   @id @default(cuid())
+  analysisId String   @unique
+  createdAt  DateTime @default(now())
+
+  totalCapital          Float
+  liquidCapital         Float
+  usableCapital         Float
+  riskAdjustedCapital   Float
+  upfrontCashNeeded     Float
+  affordabilityGap      Float
+  loanAmount            Float
+  monthlyMortgagePayment Float
+  dtiRatio              Float
+  monthlyCashFlow       Float?
+  monthlyHousingDelta   Float?
+  viabilityStatus       ViabilityStatus
+  reasoningSummary      Json?
+  aiSummary             Json?
+
+  analysis PropertyAnalysis @relation(fields: [analysisId], references: [id], onDelete: Cascade)
+}
+
+enum ChatScope {
+  ONBOARDING
+  PROFILE
+  ANALYSIS
+  COMPARE
+  GLOBAL
+}
+
+enum ChatRole {
+  USER
+  ASSISTANT
+  SYSTEM
+}
+
+model ChatMessage {
+  id        String   @id @default(cuid())
+  userId    String
+  createdAt DateTime @default(now())
+
+  conversationScope ChatScope
+  scopeId           String?
+  role              ChatRole
+  content           String @db.Text
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, conversationScope])
+}
+
+model ScenarioComparison {
+  id        String   @id @default(cuid())
+  userId    String
+  createdAt DateTime @default(now())
+
+  scenarioAId String
+  scenarioBId String
+  comparisonSummary Json?
+
+  user      User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  scenarioA PropertyAnalysis @relation("ScenarioA", fields: [scenarioAId], references: [id])
+  scenarioB PropertyAnalysis @relation("ScenarioB", fields: [scenarioBId], references: [id])
+
+  @@index([userId])
+}
