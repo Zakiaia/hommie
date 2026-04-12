@@ -122,7 +122,8 @@
     @apply border-border outline-ring/50;
   }
   body {
-    @apply bg-background text-foreground antialiased;
+    /* Background comes from `app-mesh-bg` on <body>; avoid painting over mesh gradients. */
+    @apply text-foreground antialiased;
   }
   html {
     @apply font-sans;
