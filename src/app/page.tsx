@@ -13,10 +13,7 @@ export default function HomePage() {
           </div>
           <div className="flex items-center gap-3">
             <Link href="/login">
-              <Button variant="ghost">התחבר</Button>
-            </Link>
-            <Link href="/signup">
-              <Button>הרשמה</Button>
+              <Button>התחל</Button>
             </Link>
           </div>
         </div>
@@ -34,7 +31,7 @@ export default function HomePage() {
             ומלווה אותך עד סגירת העסקה — הכל במקום אחד.
           </p>
           <div className="mt-10 flex justify-center gap-4">
-            <Link href="/signup">
+            <Link href="/login">
               <Button size="lg" className="text-base">
                 התחל בחינם
               </Button>

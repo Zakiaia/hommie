@@ -1,17 +1,19 @@
 import type { Metadata } from 'next';
-import { Geist, Geist_Mono } from 'next/font/google';
+import { DM_Sans, Fraunces } from 'next/font/google';
 import { SessionProvider } from '@/components/shared/session-provider';
 import { TooltipProvider } from '@/components/ui/tooltip';
 import './globals.css';
 
-const geistSans = Geist({
+const dmSans = DM_Sans({
   variable: '--font-sans',
   subsets: ['latin'],
+  weight: ['400', '500', '600', '700'],
 });
 
-const geistMono = Geist_Mono({
-  variable: '--font-geist-mono',
+const fraunces = Fraunces({
+  variable: '--font-display',
   subsets: ['latin'],
+  weight: ['400', '500', '600', '700'],
 });
 
 export const metadata: Metadata = {
@@ -25,8 +27,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="he" dir="rtl" suppressHydrationWarning>
-      <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
+    <html lang="he" dir="rtl" className="dark" suppressHydrationWarning>
+      <body className={`${dmSans.variable} ${fraunces.variable} app-mesh-bg min-h-screen font-sans`}>
         <SessionProvider>
           <TooltipProvider>
             {children}

@@ -74,6 +74,7 @@ export async function createAnalysis(input: CreateAnalysisInput): Promise<string
     currentPropertyValue: cs?.currentPropertyValue ?? 0,
     currentPropertyMortgage: cs?.currentPropertyMortgage ?? 0,
     expectedPropertySale: cs?.expectedPropertySale ?? false,
+    currentPropertyOwnershipPercent: cs?.currentPropertyOwnershipPercent ?? 100,
     familySupport: cs?.familySupport ?? 0,
     expectedBonus: cs?.expectedBonus ?? 0,
     futureAssetSale: cs?.futureAssetSale ?? 0,

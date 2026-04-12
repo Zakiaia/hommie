@@ -143,9 +143,13 @@ model FinancialProfile {
 
   // Step 5: Preferences
   preferredAreas        Json?
+  preferredPlacesJson   Json?
   propertyPreference    PropertyPreference?
   budgetRangeMin        Float?
   budgetRangeMax        Float?
+
+  /// Lifestyle / quiz answers (OKCupid-style), e.g. spending, social, housing prefs
+  onboardingLifestyleJson Json?
 
   // Onboarding completion
   onboardingCompleted   Boolean @default(false)
@@ -175,10 +179,12 @@ model CapitalSources {
   deposits            Float @default(0)
 
   // Property-backed
-  ownsProperty              Boolean @default(false)
-  currentPropertyValue      Float   @default(0)
-  currentPropertyMortgage   Float   @default(0)
-  expectedPropertySale      Boolean @default(false)
+  ownsProperty                      Boolean @default(false)
+  currentPropertyValue              Float   @default(0)
+  currentPropertyMortgage         Float   @default(0)
+  /// Share of ownership in existing property (0–100), affects equity attribution
+  currentPropertyOwnershipPercent Float   @default(100)
+  expectedPropertySale            Boolean @default(false)
 
   // Potential
   familySupport       Float @default(0)

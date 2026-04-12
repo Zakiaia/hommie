@@ -29,10 +29,10 @@ export function AppNav() {
   const { data: session } = useSession();
 
   return (
-    <aside className="flex h-screen w-64 shrink-0 flex-col border-l bg-card">
-      <div className="flex h-16 items-center gap-2 border-b px-6">
+    <aside className="glass-panel flex h-screen w-64 shrink-0 flex-col border-l border-white/10 bg-zinc-950/40">
+      <div className="flex h-16 items-center gap-2 border-b border-white/10 px-6">
         <Building2 className="h-6 w-6 text-primary" />
-        <span className="text-lg font-bold">Hommie</span>
+        <span className="font-heading text-lg font-semibold tracking-tight">Hommie</span>
       </div>
 
       <nav className="flex-1 space-y-1 p-3">
@@ -43,10 +43,10 @@ export function AppNav() {
               key={item.href}
               href={item.href}
               className={cn(
-                'flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm transition-colors',
+                'flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm transition-all',
                 isActive
-                  ? 'bg-primary/10 font-medium text-primary'
-                  : 'text-muted-foreground hover:bg-muted hover:text-foreground'
+                  ? 'bg-white/10 font-medium text-foreground shadow-inner'
+                  : 'text-muted-foreground hover:bg-white/5 hover:text-foreground hover:shadow-sm'
               )}
             >
               <item.icon className="h-4 w-4" />
@@ -56,7 +56,7 @@ export function AppNav() {
         })}
       </nav>
 
-      <div className="border-t p-3">
+      <div className="border-t border-white/10 p-3">
         {session?.user && (
           <div className="mb-2 px-3 text-sm text-muted-foreground">
             {session.user.name || session.user.email}

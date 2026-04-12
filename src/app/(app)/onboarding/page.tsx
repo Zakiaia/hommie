@@ -1,12 +1,24 @@
+import { redirect } from 'next/navigation';
+import { prisma } from '@/lib/db';
 import { getOrCreateProfile } from './actions';
-import { OnboardingWizard } from './wizard';
+import { OnboardingFlow } from './onboarding-flow';
 
 export default async function OnboardingPage() {
-  const profile = await getOrCreateProfile();
+  let profile = await getOrCreateProfile();
+  if (profile.onboardingCompleted) {
+    redirect('/dashboard');
+  }
+  if (!profile.onboardingCompleted && profile.currentStep <= 6) {
+    await prisma.financialProfile.update({
+      where: { id: profile.id },
+      data: { currentStep: 1 },
+    });
+    profile = { ...profile, currentStep: 1 };
+  }
 
   return (
-    <div className="mx-auto max-w-3xl p-8">
-      <OnboardingWizard profile={profile} />
+    <div className="mx-auto max-w-2xl px-4 py-8 md:px-6">
+      <OnboardingFlow profile={profile} />
     </div>
   );
 }

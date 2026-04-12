@@ -3,7 +3,6 @@
 import { useState } from 'react';
 import { signIn } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
-import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -31,7 +30,7 @@ export default function LoginPage() {
     if (result?.error) {
       setError('שגיאה בהתחברות');
     } else {
-      router.push('/dashboard');
+      router.push('/onboarding');
     }
     setLoading(false);
   }
@@ -65,12 +64,6 @@ export default function LoginPage() {
               {loading ? he.common.loading : he.auth.loginButton}
             </Button>
           </form>
-          <p className="mt-4 text-center text-sm text-muted-foreground">
-            {he.auth.noAccount}{' '}
-            <Link href="/signup" className="font-medium text-primary hover:underline">
-              {he.auth.signupLink}
-            </Link>
-          </p>
         </CardContent>
       </Card>
     </div>

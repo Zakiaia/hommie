@@ -8,6 +8,8 @@ export interface CapitalInput {
   ownsProperty: boolean;
   currentPropertyValue: number;
   currentPropertyMortgage: number;
+  /** 0–100, share of ownership in the existing property */
+  currentPropertyOwnershipPercent: number;
   expectedPropertySale: boolean;
   familySupport: number;
   expectedBonus: number;
@@ -39,9 +41,10 @@ export function calculateCapital(input: CapitalInput): CapitalBreakdown {
     input.investmentPortfolio +
     input.deposits;
 
+  const ownership = Math.min(100, Math.max(0, input.currentPropertyOwnershipPercent ?? 100)) / 100;
   const propertyEquity =
     input.ownsProperty && input.expectedPropertySale
-      ? Math.max(0, input.currentPropertyValue - input.currentPropertyMortgage)
+      ? Math.max(0, input.currentPropertyValue - input.currentPropertyMortgage) * ownership
       : 0;
 
   const potentialCapital =
