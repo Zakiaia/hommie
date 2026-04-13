@@ -2,7 +2,11 @@ import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Building2, Calculator, MessageSquare, TrendingUp } from 'lucide-react';
 
+/** Avoid serving a months-old static shell from the edge after new deploys. */
+export const dynamic = 'force-dynamic';
+
 export default function HomePage() {
+  const deploySha = process.env.VERCEL_GIT_COMMIT_SHA?.slice(0, 7);
   return (
     <div className="flex min-h-screen flex-col">
       <header className="glass-panel sticky top-0 z-10 border-b border-white/10">
@@ -87,6 +91,11 @@ export default function HomePage() {
 
       <footer className="border-t border-white/10 py-8 text-center text-sm text-muted-foreground">
         <p>המידע המוצג הינו לצרכי מידע בלבד ואינו מהווה ייעוץ משפטי, מיסויי או פיננסי.</p>
+        {deploySha ? (
+          <p className="mt-3 font-mono text-xs text-muted-foreground/70" title="מזהה הפריסה ב-Vercel">
+            גירסה {deploySha}
+          </p>
+        ) : null}
       </footer>
     </div>
   );
