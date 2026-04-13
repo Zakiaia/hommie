@@ -53,6 +53,11 @@ export default function HomePage() {
               </Button>
             </Link>
           </div>
+          <p className="mt-6 text-sm text-muted-foreground">
+            <Link href="/login?guest=1" className="underline-offset-4 hover:text-foreground hover:underline">
+              נסה בלי מייל (אורח)
+            </Link>
+          </p>
         </section>
 
         <section className="border-t border-white/10 py-16 md:py-20">
