@@ -26,8 +26,10 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const deploySha = process.env.VERCEL_GIT_COMMIT_SHA?.slice(0, 7) ?? '';
+
   return (
-    <html lang="he" dir="rtl" className="dark" suppressHydrationWarning>
+    <html lang="he" dir="rtl" className="dark" suppressHydrationWarning data-app-sha={deploySha || undefined}>
       <body className={`${dmSans.variable} ${fraunces.variable} app-mesh-bg min-h-screen font-sans`}>
         <SessionProvider>
           <TooltipProvider>
